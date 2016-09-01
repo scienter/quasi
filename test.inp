@@ -3,8 +3,8 @@
  current_order=3
  interpolation_order=2
 
- max_step=100
- save_step=100
+ max_step=10000
+ save_step=1000
  save_start=0
 
  field_save=ON

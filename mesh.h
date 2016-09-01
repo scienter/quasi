@@ -92,6 +92,8 @@ typedef struct _Domain
    Laser ***aNext;    
    Laser ***aNow;    
    Laser ***aOld;    
+   Laser ***aOld2;
+
    double ***Rho;    
    double ***Ex;    
    double ***Ey;    

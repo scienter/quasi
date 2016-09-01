@@ -31,6 +31,7 @@ void boundary(Domain *D)
   D->aNext=memoryAsignLaser(nxSub1D,nySub2D,nzSub3D);
   D->aNow=memoryAsignLaser(nxSub1D,nySub2D,nzSub3D);
   D->aOld=memoryAsignLaser(nxSub1D,nySub2D,nzSub3D);
+  D->aOld2=memoryAsignLaser(nxSub1D,1,1);
 
 }
 
