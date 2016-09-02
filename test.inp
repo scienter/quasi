@@ -3,15 +3,18 @@
  current_order=3
  interpolation_order=2
 
- max_step=10000
- save_step=1000
+ max_step=100
+ save_step=10
  save_start=0
 
+ save_mode=TXT
  field_save=ON
+ particle_save=ON
+ current_save=ON
  dump_save=1
  dump_start=10000
 
- minX=0
+ minX=0e-6
  maxX=50e-6
 
  density=1e25
@@ -48,14 +51,14 @@
  temperature=0
 
  Xnodes=4
- X0=4e-6
- X1=5e-6
- X2=10e-6
- X3=11e-6
+ X0=40e-6
+ X1=50e-6
+ X2=100e-6
+ X3=11000e-6
  Xn0=0
  Xn1=1
  Xn2=1
- Xn3=0
+ Xn3=1
 
  Ynodes=4
  Y0=-20e-6

@@ -20,7 +20,7 @@ void solveLaser(Domain *D)
   j=k=0;
 
   L=D->laserList;
-//  while(L->next)  {
+  while(L->next)  {
     for(i=istart; i<iend; i++)  {
       D->aOld2[i][0][0].real=D->aOld[i][j][k].real;
       D->aOld2[i][0][0].img=D->aOld[i][j][k].img;
@@ -54,8 +54,8 @@ void solveLaser(Domain *D)
         D->aNext[i-1][j][k].img=(D->aNext[i][j][k].real-D->aOld[i][j][k].real)*beta1+(D->aNext[i][j][k].img-D->aOld[i][j][k].img)*alpha1+D->aNow[i-1][j][k].real*beta2+D->aNow[i-1][j][k].img*alpha2+D->aOld[i-1][j][k].real*beta3+D->aOld[i-1][j][k].img*alpha3;
       }
     }
-//    L=L->next;
-//  }
+    L=L->next;
+  }
 
 }
 

@@ -9,6 +9,8 @@ void saveFile(Domain *D,int iteration)
 {
   int nTasks,myrank;
   void saveLaser(Domain *D,int iteration);
+  void saveParticle(Domain *D,int iteration);
+  void saveCurrent(Domain *D,int iteration);
 
   MPI_Comm_size(MPI_COMM_WORLD, &nTasks); 
   MPI_Comm_rank(MPI_COMM_WORLD, &myrank); 
@@ -23,17 +25,23 @@ void saveFile(Domain *D,int iteration)
     }
     else  ;
 
-/*
-          if(D.particleSave==ON) { 
-            saveParticle(&D,iteration);
-//            if(D.saveMode==TXT)               saveParticle(&D,iteration);
-//            else if(D.saveMode==HDF)  saveParticleHDF(D,iteration,D.nSpecies);
-//            else ;
-            if(myrank==0)
-              printf("particle%d is made.\n",iteration); 
-          }
-          else  ;
+    if(D->particleSave==ON) { 
+      if(D->saveMode==TXT)         saveParticle(D,iteration);
+//      else if(D.saveMode==HDF)  saveParticleHDF(D,iteration,D.nSpecies);
+      else ;
+      if(myrank==0)
+        printf("particle%d is made.\n",iteration); 
+    }
+    else  ;
 
+    if(D->currentSave==ON) { 
+      if(D->saveMode==TXT)         saveCurrent(D,iteration);
+      else ;
+      if(myrank==0)
+        printf("current%d is made.\n",iteration); 
+    }
+    else  ;
+/*
           if(D.rhoSave==ON) { 
             if(D.saveMode==TXT)         saveRho(&D,iteration);
             else if(D.saveMode==HDF)    saveDensityHDF(D,iteration,D.nSpecies);
@@ -505,7 +513,6 @@ void saveLaser(Domain *D,int iteration)
     }
 }
 
-/*
 void saveParticle(Domain *D,int iteration)
 {
   int i,j,k,istart,iend,jstart,jend,kstart,kend,s,core,index;
@@ -540,29 +547,29 @@ void saveParticle(Domain *D,int iteration)
   switch (D->dimension)
   {
   case 1:
-    for(s=0; s<D->nSpecies; s++)
-    {
+    for(s=0; s<D->nSpecies; s++)    {
       sprintf(name,"%dParticle%d_%d",s,iteration,myrank);
       out = fopen(name,"w");    
       j=k=0;
       for(i=istart; i<iend; i++)
+      {
+        p=particle[i][j][k].head[s]->pt;
+        while(p)
         {
-          p=particle[i][j][k].head[s]->pt;
-          while(p)
-          {
-            x=((i-istart+D->minXSub)+p->x)*D->dx*D->lambda; 
-            p1=p->p1;
-            p2=p->p2;    
-            p3=p->p3;
-            gamma=sqrt(1.0+p->p1*p->p1+p->p2*p->p2+p->p3*p->p3);
-            index=p->index;
-            fprintf(out,"%g %g %g %g %g %d\n",x,p1,p2,p3,gamma,index);               
-//              fprintf(out,"%g %g %g %g %g\n",x,y,p->E1,p->E2,p->E3);               
-            p=p->next;
-          }	//End of while(p)
-        }
-    }				//End of for(s)
+          x=((i-istart+D->minXSub)+p->x)*D->dx/D->kp; 
+          p1=p->p1;
+          p2=p->p2;    
+          p3=p->p3;
+//          gamma=sqrt(1.0+p->p1*p->p1+p->p2*p->p2+p->p3*p->p3);
+          index=p->index;
+          fprintf(out,"%g %g %g %g %d\n",x,p1,p2,p3,index);               
+//              fprintf(out,"%g %g %g %g %g\n",x,y,p->E1,p->E2,p->E3); 
+          p=p->next;
+        }	//End of while(p)
+      }
+    }	//End of for(s)
     break;
+/*
   case 2:
     for(s=0; s<D->nSpecies; s++)
     {
@@ -575,8 +582,8 @@ void saveParticle(Domain *D,int iteration)
           p=particle[i][j][k].head[s]->pt;
           while(p)
           {
-            x=((i-istart+D->minXSub)+p->x)*D->dx*D->lambda; 
-            y=((j-jstart+D->minYSub)+p->y)*D->dy*D->lambda; 
+            x=((i-istart+D->minXSub)+p->x)*D->dx/D->kp; 
+            y=((j-jstart+D->minYSub)+p->y)*D->dy/D->kp; 
             p1=p->p1;
             p2=p->p2;    
             p3=p->p3;
@@ -622,8 +629,45 @@ void saveParticle(Domain *D,int iteration)
       fclose(out);
     }				//End of for(s)
     break;
+*/
   default:
     ;
   }
 }
-*/
+
+void saveCurrent(Domain *D,int iteration)
+{
+    int i,j,k,istart,iend,jstart,jend,kstart,kend;
+    char name[100];
+    double x,y,z,Jx,Jy,Jz;
+    FILE *out;
+    int myrank, nprocs;    
+    MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+
+    istart=D->istart;
+    iend=D->iend;
+    jstart=D->jstart;
+    jend=D->jend;
+    kstart=D->kstart;
+    kend=D->kend;
+
+    sprintf(name,"current%d_%d",iteration,myrank);
+    out = fopen(name,"w");
+
+    switch(D->dimension) {
+    case 1:
+      j=k=0;
+      for(i=istart; i<iend; i++)
+      {
+        x=(i-2+D->minXSub)*D->dx/D->kp;
+        Jx=D->Jx[i][j][k];    
+        Jy=D->Jy[i][j][k];
+        Jz=D->Jz[i][j][k];
+        fprintf(out,"%g %g %g %g\n",x,Jx,Jy,Jz);
+      }
+      fclose(out);
+      break;
+    default :
+      ;
+    }
+}

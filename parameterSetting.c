@@ -93,6 +93,10 @@ void parameterSetting(Domain *D,char *input)
      D->rhoSave=whatONOFF(str);
    else
      D->rhoSave=ON;
+   if(FindParameters("Domain",1,"current_save",input,str))
+     D->currentSave=whatONOFF(str);
+   else
+     D->currentSave=ON;
 
    //domain
    if(FindParameters("Domain",1,"max_time",input,str)) D->maxTime=atoi(str);
@@ -141,7 +145,7 @@ void parameterSetting(Domain *D,char *input)
    while(D->nx*D->dx<D->domainX)
      D->nx+=1;
 
-   D->minXSub=0;
+   D->minXSub=D->domainMinX*D->division;
 printf("nx=%d, nx*dx=%g\n",D->nx,D->nx*D->dx/D->kp);
 
    //Laser parameter setting
@@ -159,7 +163,20 @@ printf("nx=%d, nx*dx=%g\n",D->nx,D->nx*D->dx/D->kp);
    }
    D->nLaser = rank-1;
 
-
+   //Plasma parameter setting
+   D->loadList = (LoadList *)malloc(sizeof(LoadList));
+   D->loadList->next = NULL;
+   LL = D->loadList;
+   rank = 1;
+   while(findLoadParameters(rank, LL, D,input))
+   {
+      New = (LoadList *)malloc(sizeof(LoadList));
+      New->next = NULL;
+      LL->next=New;
+      LL=LL->next;
+      rank ++;
+   }
+   D->nSpecies = rank-1;
 
    if(fail==1)
      exit(0);
@@ -217,7 +234,7 @@ int findLaserParameters(int rank, LaserList *L,Domain *D,char *input)
    return mode;
 }
 
-/*
+
 int findLoadParameters(int rank, LoadList *LL,Domain *D,char *input)
 {
    int FindParameters();
@@ -242,23 +259,19 @@ int findLoadParameters(int rank, LoadList *LL,Domain *D,char *input)
    if(FindParameters("Plasma",rank,"type",input,name)) 
    {
      LL->type = whatPlasmaType(name);
-     if(D->boostOn==ON)
-       LL->type = BoostFrame;
+//     if(D->boostOn==ON)
+//       LL->type = BoostFrame;
    }
    else LL->type=0;
 
    if(LL->type>0)
    {
       if(FindParameters("Plasma",rank,"density",input,str)) 
-      {
          LL->density=atof(str);
-         LL->density*=D->gamma;
-      }
       else  {
          printf("in [Plasma], density=? [m-3]\n");
          fail=1;
       }
-
 
       if(FindParameters("Plasma",rank,"species",input,name)) 
          species = whatSpecies(name);
@@ -277,12 +290,8 @@ int findLoadParameters(int rank, LoadList *LL,Domain *D,char *input)
       if(FindParameters("Plasma",rank,"temperature",input,str))  
          LL->temperature=atof(str);
       else   LL->temperature=0.0;	
-      if(FindParameters("Plasma",rank,"given_min_px",input,str)) 
-         LL->givenMinPx = atof(str);
-      else  LL->givenMinPx = -1e9;
       LL->mass=whatMass(species);
       LL->charge=whatCharge(species);
-      LL->criticalDensity=eps0*eMass*D->omega*D->omega/eCharge/eCharge;
 //      LL->superP=LL->density*D->lambda*D->dx*D->lambda*D->dy*D->lambda*D->dz/LL->numberInCell;
 
       srand(1*(myrank+1));
@@ -302,7 +311,7 @@ int findLoadParameters(int rank, LoadList *LL,Domain *D,char *input)
           {
             sprintf(name,"X%d",i);
             if(FindParameters("Plasma",rank,name,input,str)) 
-              LL->xpoint[i] = atof(str)/D->gamma/D->lambda/D->dx;
+              LL->xpoint[i] = atof(str)*D->kp*D->division;
             else 
             { printf("X%d should be defined.\n",i);  fail=1; }
 
@@ -313,6 +322,7 @@ int findLoadParameters(int rank, LoadList *LL,Domain *D,char *input)
             { printf("Xn%d should be defined.\n",i);  fail=1; } 
           }
         }
+/*
         if(D->dimension>1)
         {
           if(FindParameters("Plasma",rank,"Ynodes",input,str)) LL->ynodes=atoi(str);
@@ -368,6 +378,7 @@ int findLoadParameters(int rank, LoadList *LL,Domain *D,char *input)
             { printf("Zn%d should be defined.\n",i);  fail=1; } 
           }
         }
+
         if(FindParameters("Plasma",rank,"centerX",input,str))  
           LL->centerX=atof(str)/D->lambda/D->dx;
         else   LL->centerX=0.0;	
@@ -411,8 +422,9 @@ int findLoadParameters(int rank, LoadList *LL,Domain *D,char *input)
           else   LL->polyCoefYZ2=0.0;	
         }
         else 	;
+*/
         break;
-
+/*
       case Defined :
 //        srand(time(NULL)*(myrank+1));
         if(FindParameters("Plasma",rank,"define_mode",input,str))  
@@ -613,6 +625,7 @@ int findLoadParameters(int rank, LoadList *LL,Domain *D,char *input)
         LL->maxLoadTime=(int)((max+1)*D->divisionLambda);
         LL->minLoadTime=(int)((min-1)*D->divisionLambda);
         break;
+*/
       }
    
    }	//end of if(species)
@@ -622,7 +635,6 @@ int findLoadParameters(int rank, LoadList *LL,Domain *D,char *input)
 
    return LL->type;
 }
-*/
 
 
 int whatDefineMode(char *str)

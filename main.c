@@ -57,19 +57,6 @@ int main(int argc, char *argv[])
       L=L->next;
     }
        
-
-/*
-    //load boost frame's laser
-    iif(D.boostOn==1) {
-      L=D.laserList;
-      while(L->next)  {
-        boostLoadLaser2D(&D,L);  
-        L=L->next;
-      }
-      MPI_TransferF_DSX_Yminus(&D,D.numShareDn);
-      MPI_TransferF_DSX_Yplus(&D,D.numShareUp);
-    }
-*/
 /*
     //load plasma or load dump file
     if(argc >= 3)
@@ -107,62 +94,28 @@ int main(int argc, char *argv[])
        saveFile(&D,iteration);
 
        solveLaser(&D);
-/*
-       fieldSolve(&D);
-       interpolation(&D,&Ext);
-       particlePush(&D);
 
+//       fieldSolve(&D);
+//       interpolation(&D,&Ext);
+       particlePush(&D);
        updateCurrent(&D);
 
-       if (iteration>=D.nx && D.moving==ON && D.boostOn==OFF)
-       {
-         movingDomain(&D);
-         LL=D.loadList;
-         s=0;
-         while(LL->next)
-         {
-           loadMovingPlasma(&D,LL,s,iteration);
-           LL=LL->next;
-           s++;
-         }
-         rearrangeParticles(&D);
-         if(D.M>1)
-           particleShareY(&D);
-         if(D.N>1)
-           particleShareZ(&D);
-         removeEdge(&D);
+       LL=D.loadList;
+       s=0;
+       while(LL->next)   {
+         loadPlasma(&D,LL,s,iteration);
+         LL=LL->next;
+         s++;
        }
-       else if(D.boostOn==ON) {
-         LL=D.loadList;
-         s=0;
-         while(LL->next)
-         {
-           loadMovingPlasma(&D,LL,s,iteration);
-           LL=LL->next;
-           s++;
-         }
-         movingDomain(&D);
-         rearrangeParticles(&D);
-         if(D.M>1)
-           particleShareY(&D);
-         removeEdge(&D);
-       }
-       else
-       {
-          rearrangeParticles(&D);
-          if(D.M>1)
-            particleShareY(&D);
-          if(D.N>1)
-            particleShareZ(&D);
-          removeEdge(&D);
-       }
-*/
+       rearrangeParticles(&D);
+       removeEdge(&D);
+
        //time update
        if(iteration%10==0 && myrank==0)  
           printf("iteration = %d\n",iteration);           
        iteration+=1;
        t=D.dt*iteration;  
-
+       D.minXSub++;
     }     //end of time roop                  
 /*
     if(D.tracking==ON)

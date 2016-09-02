@@ -42,6 +42,7 @@ typedef struct _Domain
    int dumpStep;
    int fieldSave;
    int particleSave;
+   int currentSave;
    int rhoSave;
 
    int nx;             //Total domain
@@ -117,12 +118,6 @@ typedef struct _Domain
    double ***Jx;    
    double ***Jy;    
    double ***Jz;    
-   double ***JxOld;    
-   double ***JyOld;    
-   double ***JzOld;    
-   double ***JxBoost;    
-   double ***JyBoost;    
-   double ***JzBoost;    
    
    struct _Particle ***particle;    
    struct _Boost **boost;    

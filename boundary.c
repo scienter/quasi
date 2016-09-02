@@ -8,7 +8,8 @@
 void boundary(Domain *D)
 {
   FILE *out;
-  int nxSub1D,nySub2D,nzSub3D;
+  int i,j,k,s,nxSub1D,nySub2D,nzSub3D;
+  int startj,startk;
   int myrank, nTasks,a;
   double ***memoryAsign();
   Laser ***memoryAsignLaser();
@@ -28,10 +29,48 @@ void boundary(Domain *D)
   D->maxXSub=D->minXSub+D->nx;
 
   // laser setting
-  D->aNext=memoryAsignLaser(nxSub1D,nySub2D,nzSub3D);
-  D->aNow=memoryAsignLaser(nxSub1D,nySub2D,nzSub3D);
-  D->aOld=memoryAsignLaser(nxSub1D,nySub2D,nzSub3D);
-  D->aOld2=memoryAsignLaser(nxSub1D,1,1);
+   D->aNext=memoryAsignLaser(nxSub1D,nySub2D,nzSub3D);
+   D->aNow=memoryAsignLaser(nxSub1D,nySub2D,nzSub3D);
+   D->aOld=memoryAsignLaser(nxSub1D,nySub2D,nzSub3D);
+   D->aOld2=memoryAsignLaser(nxSub1D,1,1);
+
+   // current setting
+   D->Jx=memoryAsign(nxSub1D,nySub2D,nzSub3D);
+   D->Jy=memoryAsign(nxSub1D,nySub2D,nzSub3D);
+   D->Jz=memoryAsign(nxSub1D,nySub2D,nzSub3D);
+
+
+
+   // Particle setting
+   nxSub1D=D->nxSub+3;
+   nySub2D=1;
+   nzSub3D=1;
+   startj=0;
+   startk=0;
+
+   D->particle = (Particle ***)malloc((nxSub1D)*sizeof(Particle **));
+   for(i=0; i<nxSub1D; i++) {
+     D->particle[i] = (Particle **)malloc((nySub2D)*sizeof(Particle *));
+     for(j=0; j<nySub2D; j++)
+       D->particle[i][j] = (Particle *)malloc((nzSub3D)*sizeof(Particle ));
+   }
+
+   // setting up particle's pointer
+   if(D->dimension==1)
+   {
+     j=k=0;
+     for(i=0; i<D->iend+1; i++)       //i starts at 0 because of boost frame
+     {
+       D->particle[i][j][k].head = (ptclHead **)malloc(D->nSpecies*sizeof(ptclHead *));
+       for(s=0; s<D->nSpecies; s++)       {
+         D->particle[i][j][k].head[s] = (ptclHead *)malloc(sizeof(ptclHead));
+         D->particle[i][j][k].head[s]->pt = NULL;
+       }
+     }
+   }
+
+
+
 
 }
 
