@@ -20,6 +20,7 @@ typedef struct _ptclList  {
     double B1;    
     double B2;    
     double B3;    
+    double aa;
     int index; 
     int core; 
     struct _ptclList *next;

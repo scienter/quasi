@@ -104,9 +104,9 @@ void updateCurrent1D_1st(Domain *D,int nSpecies)
             p=particle[i][j][k].head[s]->pt;     
             while(p) 
             {
-              gamma=sqrt(1.0+p->p1*p->p1+p->p2*p->p2+p->p3*p->p3);
+              gamma=sqrt(1.0+p->p1*p->p1+p->p2*p->p2+p->p3*p->p3+0.5*p->aa);
               x2=p->x+i;             
-              x1=p->oldX-1;          
+              x1=p->oldX;          
               i1=(int)x1;         
               i2=(int)x2;    
               vy=p->p2/gamma;

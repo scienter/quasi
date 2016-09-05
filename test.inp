@@ -3,8 +3,8 @@
  current_order=3
  interpolation_order=2
 
- max_step=100
- save_step=10
+ max_step=1000
+ save_step=200
  save_start=0
 
  save_mode=TXT
@@ -18,12 +18,12 @@
  maxX=50e-6
 
  density=1e25
- division=20	// dx is [wavelength/divisionLambda]
+ division=40	// dx is [wavelength/divisionLambda]
 
 [Laser]
  mode=1
  wavelength=1e-6
- a0=2
+ a0=1
  rU=4			//number of wave lenth
  rD=4
  flat=0
@@ -46,7 +46,7 @@
  species=Electron
  type=Polygon
  density=1e25
- numberInCell=2
+ numberInCell=10
  startIndex=0		//The starting particle index
  temperature=0
 
@@ -74,19 +74,19 @@
  species=HPlus1
  type=Polygon
  density=1e25
- numberInCell=2
+ numberInCell=10
  startIndex=0		//The starting particle index
  temperature=0
 
  Xnodes=4
- X0=4e-6
- X1=5e-6
- X2=10e-6
- X3=11e-6
+ X0=40e-6
+ X1=50e-6
+ X2=100e-6
+ X3=11000e-6
  Xn0=0
  Xn1=1
  Xn2=1
- Xn3=0
+ Xn3=1
 
  Ynodes=4
  Y0=-20e-6

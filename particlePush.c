@@ -15,10 +15,10 @@ void particlePush(Domain *D)
     particlePush1D(D);
     break;
   case 2 :
-    particlePush2D(D);
+//    particlePush2D(D);
     break;
   case 3 :
-    particlePush3D(D);
+//    particlePush3D(D);
     break;
   default :
     printf("In particlePush, what dimension(%d)?\n",D->dimension);
@@ -31,12 +31,13 @@ void particlePush1D(Domain *D)
 {
     int i,j,k,istart,iend,l,m,s,shift,cnt;
     double x,shiftX,dt,dx,gamma,sqrT,coef;
-    double E1,Pr,Pl,B1,Sr,Sl;
+    double E1,Pr,Pl,B1,Sr,Sl,nextA,presA,devAX,ponPushX;
     double pMinus[3],T[3],S[3],operate[3][3],pPlus[3];
     Particle ***particle;
     particle=D->particle;
     LoadList *LL;
     ptclList *p, *New, *tmp, *prev;
+    double ponderoPushX(ptclList *p,double coef,double devAX);
 
     istart=D->istart;
     iend=D->iend;
@@ -66,10 +67,14 @@ void particlePush1D(Domain *D)
     shiftX=0;
 
     j=k=0;
-    for(i=istart; i<iend; i++)
+    for(i=istart; i<iend; i++) 
+    { 
+      nextA=D->aNow[i+1][j][k].real*D->aNow[i+1][j][k].real+D->aNow[i+1][j][k].img*D->aNow[i+1][j][k].img;
+      presA=D->aNow[i][j][k].real*D->aNow[i][j][k].real+D->aNow[i][j][k].img*D->aNow[i][j][k].img;
+      devAX=(nextA-presA)/dx;
         for(s=0; s<D->nSpecies; s++)
         {
-          coef=0.5*charge[s]/mass[s]*dt;
+          coef=charge[s]/mass[s]*dt;
           p=particle[i][j][k].head[s]->pt;     
           while(p)
           {    
@@ -105,29 +110,31 @@ void particlePush1D(Domain *D)
               for(m=0; m<3; m++)   
                 pPlus[l]+=operate[l][m]*pMinus[m];
             }
+
             //Updated momentum              
-            p->p1=pPlus[0]+coef*(p->E1); 
+            ponPushX=ponderoPushX(p,coef,devAX);
+            p->p1=pPlus[0]+coef*(p->E1)-0.25*ponPushX; 
             p->p2=pPlus[1]+coef*(p->E2);    
             p->p3=pPlus[2]+coef*(p->E3); 
     
             //Translation
-            gamma=sqrt(1.0+p->p1*p->p1+p->p2*p->p2+p->p3*p->p3);
-            shiftX=p->p1/gamma-1;    //dt is ignored because of dx=dt=1 in cell.
+            gamma=sqrt(1.0+p->p1*p->p1+p->p2*p->p2+p->p3*p->p3+0.5*p->aa);
+            shiftX=p->p1/gamma;    //dt is ignored because of dx=dt=1 in cell.
              //dt is ignored because of dx=dt=1 in cell.
-            if(shiftX<=-2.0)  {
+            if(shiftX<=-1.0 || shiftX>=1.0)  {
               printf("particle's movement exceeds C velocity\n");
               printf("i=%d,shiftX=%g\n",i,shiftX);
               exit(0);
             } 
             p->oldX=i+p->x;
-            p->x+=shiftX;
+            p->x+=shiftX-1.0;
             p=p->next;
           }		//End of while(p)
         }		//End of for(s)
-
+    }
 }
 
-
+/*
 void particlePush2D(Domain *D)
 {
     int i,j,k,istart,iend,jstart,jend,kstart,kend,l,m,s,shift,cnt;
@@ -144,14 +151,14 @@ void particlePush2D(Domain *D)
     iend=D->iend;
     jstart=D->jstart;
     jend=D->jend;
-/*
+
     for(i=0; i<3; i++)   {
        pMinus[i]=0.0;
        T[i]=0.0;
        S[i]=0.0;
        pPlus[i]=0.0;
     }
-*/
+
     dt=D->dt;
     dx=D->dx;
     dy=D->dy;
@@ -359,5 +366,49 @@ void particlePush3D(Domain *D)
       }      	//End of for(i,j)
 
 }
+*/
+            
+double ponderoPushX(ptclList *p,double coef,double devAX)
+{
+   double a,px,py,pz,temp,k1,k2;
+   
+   a=p->aa;
+   px=p->p1;
+   py=p->p2;
+   pz=p->p3;
+   temp=1.0+a*0.5+px*px+py*py+pz*pz;
+   k1=1.0/sqrt(temp)*coef*devAX;
+   temp=1.0+a*0.5+(px+0.5*k1)*(px+0.5*k1)+py*py+pz*pz;
+   k2=1.0/sqrt(temp)*coef*devAX;
+   return k2;
+} 
 
-             
+double ponderoPushY(ptclList *p,double coef,double devAY)
+{
+   double a,px,py,pz,temp,k1,k2;
+   
+   a=p->aa;
+   px=p->p1;
+   py=p->p2;
+   pz=p->p3;
+   temp=1.0+a*0.5+px*px+py*py+pz*pz;
+   k1=1.0/sqrt(temp)*coef*devAY;
+   temp=1.0+a*0.5+px*px+(py+0.5*k1)*(py+0.5*k1)+pz*pz;
+   k2=1.0/sqrt(temp)*coef*devAY;
+   return k2;
+} 
+
+double ponderoPushZ(ptclList *p,double coef,double devAZ)
+{
+   double a,px,py,pz,temp,k1,k2;
+   
+   a=p->aa;
+   px=p->p1;
+   py=p->p2;
+   pz=p->p3;
+   temp=1.0+a*0.5+px*px+py*py+pz*pz;
+   k1=1.0/sqrt(temp)*coef*devAZ;
+   temp=1.0+a*0.5+px*px+py*py+(pz+0.5*k1)*(pz+0.5*k1);
+   k2=1.0/sqrt(temp)*coef*devAZ;
+   return k2;
+} 

@@ -96,7 +96,8 @@ int main(int argc, char *argv[])
        solveLaser(&D);
 
 //       fieldSolve(&D);
-//       interpolation(&D,&Ext);
+       interpolation(&D);
+
        particlePush(&D);
        updateCurrent(&D);
 
@@ -107,6 +108,7 @@ int main(int argc, char *argv[])
          LL=LL->next;
          s++;
        }
+
        rearrangeParticles(&D);
        removeEdge(&D);
 

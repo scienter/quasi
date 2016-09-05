@@ -39,6 +39,14 @@ void boundary(Domain *D)
    D->Jy=memoryAsign(nxSub1D,nySub2D,nzSub3D);
    D->Jz=memoryAsign(nxSub1D,nySub2D,nzSub3D);
 
+   // field setting
+   D->Ex=memoryAsign(nxSub1D,nySub2D,nzSub3D);
+   D->Ey=memoryAsign(nxSub1D,nySub2D,nzSub3D);
+   D->Ez=memoryAsign(nxSub1D,nySub2D,nzSub3D);
+   D->Bx=memoryAsign(nxSub1D,nySub2D,nzSub3D);
+   D->By=memoryAsign(nxSub1D,nySub2D,nzSub3D);
+   D->Bz=memoryAsign(nxSub1D,nySub2D,nzSub3D);
+
 
 
    // Particle setting

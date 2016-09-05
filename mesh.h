@@ -268,7 +268,7 @@ void movingDomain(Domain *D);
 void loadMovingPlasma(Domain *D,LoadList *LL,int s,int iteration);
 void updateCurrent(Domain *D);
 void particlePush(Domain *D);
-void interpolation(Domain *D,External *Ext);
+void interpolation(Domain *D);
 void fieldSolve(Domain *D);
 void loadLaser(Domain *D,LaserList *L,double t);
 void saveFile(Domain *D,int iteration);
