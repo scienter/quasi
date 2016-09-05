@@ -106,7 +106,7 @@ void updateCurrent1D_1st(Domain *D,int nSpecies)
             {
               gamma=sqrt(1.0+p->p1*p->p1+p->p2*p->p2+p->p3*p->p3+0.5*p->aa);
               x2=p->x+i;             
-              x1=p->oldX;          
+              x1=p->oldX-1.0;          
               i1=(int)x1;         
               i2=(int)x2;    
               vy=p->p2/gamma;
