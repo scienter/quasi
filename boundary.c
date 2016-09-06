@@ -39,6 +39,9 @@ void boundary(Domain *D)
    D->Jy=memoryAsign(nxSub1D,nySub2D,nzSub3D);
    D->Jz=memoryAsign(nxSub1D,nySub2D,nzSub3D);
 
+   // gamma,density setting
+   D->gamma=memoryAsign(nxSub1D,nySub2D,nzSub3D);
+   D->Rho=memoryAsign(nxSub1D,nySub2D,nzSub3D);
 
 
    // Particle setting

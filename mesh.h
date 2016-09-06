@@ -96,6 +96,7 @@ typedef struct _Domain
    Laser ***aOld2;
 
    double ***Rho;    
+   double ***gamma;    
    double ***Ex;    
    double ***Ey;    
    double ***Ez;    
@@ -133,8 +134,8 @@ typedef struct _Domain
    //Boost
    int boostOn;
    int boostIon;
-   double gamma;
    double beta;
+   double gamma0;
    int minT;	//boost frame's step
    int maxT;	//boost frame's step
    int boostSaveStep;	//lab frame's step

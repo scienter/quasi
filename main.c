@@ -93,12 +93,13 @@ int main(int argc, char *argv[])
        //save File      
        saveFile(&D,iteration);
 
-       solveLaser(&D);
 
 //       fieldSolve(&D);
 //       interpolation(&D,&Ext);
        particlePush(&D);
        updateCurrent(&D);
+
+       solveLaser(&D);
 
        LL=D.loadList;
        s=0;

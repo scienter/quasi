@@ -54,7 +54,7 @@ void loadMovingPlasma_crystal(Domain *D,LoadList *LL,int s)
            v1=maxwellianVelocity(LL->temperature)/velocityC;
            v2=maxwellianVelocity(LL->temperature)/velocityC;
            v3=maxwellianVelocity(LL->temperature)/velocityC;
-           New->p1=-D->gamma*D->beta+v1;
+           New->p1=v1;
            New->p2=v2;
            New->p3=v3;
            LL->index++;
