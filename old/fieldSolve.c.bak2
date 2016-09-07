@@ -107,18 +107,18 @@ void solveLaser(Domain *D)
       c=-dt/dx;
       a=1.0+c+densityRatio;
       d=-1.0+c-densityRatio;
-      b=L->k0*dt;       
+      b=-L->k0*dt;       
       e=a*a+b*b;
 
       alpha1=a*c/e;
       beta1=-b*c/e;
-      alpha2=2.0*alpha1;
+      alpha2=2.0*a/e;
       beta2=-2.0*b/e;
       alpha3=(a*d+b*b)/e;
       beta3=(b*a-b*d)/e;
 
-      D->aNext[i][j][k].real=(D->aNow[i][j][k].real-D->aOld2[i][j][k].real)*alpha1-(D->aNow[i][j][k].img-D->aOld2[i][j][k].img)*beta1+D->aNow[i-1][j][k].real*alpha2-D->aNow[i-1][j][k].img*beta2+D->aOld[i-1][j][k].real*alpha3-D->aOld[i-1][j][k].img*beta3;
-      D->aNext[i][j][k].img=(D->aNow[i][j][k].real-D->aOld2[i][j][k].real)*beta1+(D->aNow[i][j][k].img-D->aOld2[i][j][k].img)*alpha1+D->aNow[i-1][j][k].real*beta2+D->aNow[i-1][j][k].img*alpha2+D->aOld[i-1][j][k].real*beta3+D->aOld[i-1][j][k].img*alpha3;
+      D->aNext[i-1][j][k].real=(D->aNow[i][j][k].real-D->aOld2[i][j][k].real)*alpha1-(D->aNow[i][j][k].img-D->aOld2[i][j][k].img)*beta1+D->aNow[i-1][j][k].real*alpha2-D->aNow[i-1][j][k].img*beta2+D->aOld[i-1][j][k].real*alpha3-D->aOld[i-1][j][k].img*beta3;
+      D->aNext[i-1][j][k].img=(D->aNow[i][j][k].real-D->aOld2[i][j][k].real)*beta1+(D->aNow[i][j][k].img-D->aOld2[i][j][k].img)*alpha1+D->aNow[i-1][j][k].real*beta2+D->aNow[i-1][j][k].img*alpha2+D->aOld[i-1][j][k].real*beta3+D->aOld[i-1][j][k].img*alpha3;
     }
 
     for(n=0; n<1; n++)  {
@@ -127,12 +127,12 @@ void solveLaser(Domain *D)
         c=-dt/dx;
         a=1.0+c+densityRatio;
         d=-1.0+c-densityRatio;
-        b=L->k0*dt;       
+        b=-L->k0*dt;       
         e=a*a+b*b;
 
         alpha1=a*c/e;
         beta1=-b*c/e;
-        alpha2=2.0*alpha1;
+        alpha2=2.0*a/e;
         beta2=-2.0*b/e;
         alpha3=(a*d+b*b)/e;
         beta3=(b*a-b*d)/e;

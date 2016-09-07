@@ -30,24 +30,16 @@ void particlePush(Domain *D)
 void particlePush1D(Domain *D)
 {
     int i,j,k,istart,iend,l,m,s,shift,cnt;
-    double x,shiftX,dt,dx,gamma,sqrT,coef,oldP2,nowP2,fluidGamma;
-    double E1,Pr,Pl,B1,Sr,Sl,nextA,presA,devAX,ponPushX;
-    double pMinus[3],T[3],S[3],operate[3][3],pPlus[3];
+    double x,shiftX,dt,dx,gamma,gamma0,oldGamma,fluidGamma,coef,k1,k2;
+    double A1,A2,A3,a,b;
+    double Ex,Ey,Ez,Bx,By,Bz,p1,p2,p3,aa,nextA,presA,devAX;
     Particle ***particle;
     particle=D->particle;
     LoadList *LL;
     ptclList *p, *New, *tmp, *prev;
-    double ponderoPushX(ptclList *p,double coef,double devAX);
 
     istart=D->istart;
     iend=D->iend;
-
-    for(i=0; i<3; i++)   {
-       pMinus[i]=0.0;
-       T[i]=0.0;
-       S[i]=0.0;
-       pPlus[i]=0.0;
-    }
 
     dt=D->dt;
     dx=D->dx;
@@ -69,63 +61,55 @@ void particlePush1D(Domain *D)
     j=k=0;
     for(i=istart; i<iend; i++) 
     { 
-      nextA=D->aNow[i+1][j][k].real*D->aNow[i+1][j][k].real+D->aNow[i+1][j][k].img*D->aNow[i+1][j][k].img;
-      presA=D->aNow[i][j][k].real*D->aNow[i][j][k].real+D->aNow[i][j][k].img*D->aNow[i][j][k].img;
-      devAX=(nextA-presA)/dx;
-      
-      fluidGamma=0.0;
+      A1=D->aNow[i][j][k].real*D->aNow[i][j][k].real+D->aNow[i][j][k].img*D->aNow[i][j][k].img;
+      A2=D->aNow[i+1][j][k].real*D->aNow[i+1][j][k].real+D->aNow[i+1][j][k].img*D->aNow[i+1][j][k].img;
+      A3=D->aNow[i+2][j][k].real*D->aNow[i+2][j][k].real+D->aNow[i+2][j][k].img*D->aNow[i+2][j][k].img;
+      a=(A1-A2)+0.5*(A3-A1);
+      b=2.0*(A2-A1)+0.5*(A1-A3);
+
+      cnt=0; 
+      fluidGamma=0.0; 
         for(s=0; s<D->nSpecies; s++)
         {
           coef=charge[s]/mass[s]*dt;
           p=particle[i][j][k].head[s]->pt;    
-          cnt=0; 
           while(p)
-          {    
-            oldP2=p->p1*p->p1+p->p2*p->p2+p->p3*p->p3;
+          {   
+            oldGamma=p->gamma;
+            devAX=(2.0*a*p->x+b)*0.25; 
+            Ex=p->E1;
+            Ey=p->E2;
+            Ez=p->E3;
+            Bx=p->B1;
+            By=p->B2;
+            Bz=p->B3;
+            p1=p->p1;
+            p2=p->p2;
+            p3=p->p3;
+            aa=p->aa;
+            gamma0=sqrt(1.0+p1*p1+p2*p2+p3*p3+0.5*aa);
+            
+            //Calculate vector px
+            k1=coef*(Ex+p2*Bz-p3*By+devAX)/gamma0;
+            gamma=sqrt(1.0+(p1+0.5*k1)*(p1+0.5*k1)+p2*p2+p3*p3+0.5*aa);
+            k2=coef*(Ex+p2*Bz-p3*By+devAX)/gamma;
+            p->p1+=k2;
 
-            //Calculate vector P- 
-            pMinus[0]=p->p1+coef*(p->E1);
-            pMinus[1]=p->p2+coef*(p->E2);    
-            pMinus[2]=p->p3+coef*(p->E3);
+            //Calculate vector py
+            k1=coef*(Ey-p1*Bz+p3*Bx)/gamma0;
+            gamma=sqrt(1.0+p1*p1+(p2+0.5*k1)*(p2+0.5*k1)+p3*p3+0.5*aa);
+            k2=coef*(Ey-p1*Bz+p3*Bx)/gamma;
+            p->p2+=k2;
 
-            //Calculate vector T 
-            gamma=sqrt(1.0+pMinus[0]*pMinus[0]+pMinus[1]*pMinus[1]+pMinus[2]*pMinus[2]);           
-            T[0]=coef/gamma*(p->B1);   
-            T[1]=coef/gamma*(p->B2);
-            T[2]=coef/gamma*(p->B3);
+            //Calculate vector pz
+            k1=coef*(Ez+p1*By-p2*Bx)/gamma0;
+            gamma=sqrt(1.0+p1*p1+p2*p2+(p3+0.5*k1)*(p3+0.5*k1)+0.5*aa);
+            k2=coef*(Ez+p1*By-p2*Bx)/gamma;
+            p->p3+=k2;
 
-            //Calculate vector S
-            sqrT=1.0+T[0]*T[0]+T[1]*T[1]+T[2]*T[2];
-            for(l=0; l<3; l++)  
-              S[l]=2.0*T[l]/sqrT;
-  
-            //Calculate operator A from P+=A.P-
-            operate[0][0]=1.0-S[2]*T[2]-S[1]*T[1];      
-            operate[0][1]=S[1]*T[0]+S[2];    
-            operate[0][2]=S[2]*T[0]-S[1];     
-            operate[1][0]=S[0]*T[1]-S[2];        
-            operate[1][1]=1.0-S[0]*T[0]-S[2]*T[2];          
-            operate[1][2]=S[2]*T[1]+S[0];         
-            operate[2][0]=S[0]*T[2]+S[1];    
-            operate[2][1]=S[1]*T[2]-S[0];    
-            operate[2][2]=1-S[0]*T[0]-S[1]*T[1]; 
-            //Calculate vector P+
-            for(l=0; l<3; l++)  {
-              pPlus[l]=0.0;
-              for(m=0; m<3; m++)   
-                pPlus[l]+=operate[l][m]*pMinus[m];
-            }
-
-            //Updated momentum              
-            ponPushX=ponderoPushX(p,coef,devAX);
-            p->p1=pPlus[0]+coef*(p->E1)-0.25*ponPushX; 
-            p->p2=pPlus[1]+coef*(p->E2);    
-            p->p3=pPlus[2]+coef*(p->E3); 
-    
+            p->gamma=gamma=sqrt(1.0+p1*p1+p2*p2+p3*p3+0.5*aa);
             //Translation
-            nowP2=p->p1*p->p1+p->p2*p->p2+p->p3*p->p3;
-            gamma=sqrt(1.0+nowP2+0.5*p->aa);
-            shiftX=dt/dx*p->p1/gamma;    //dt is ignored because of dx=dt=1 in cell.
+            shiftX=p->p1/gamma;    //dt is ignored because of dx=dt=1 in cell.
              //dt is ignored because of dx=dt=1 in cell.
             if(shiftX<=-1.0 || shiftX>=1.0)  {
               printf("particle's movement exceeds C velocity\n");
@@ -133,17 +117,18 @@ void particlePush1D(Domain *D)
               exit(0);
             } 
             p->oldX=i+p->x;
-            p->x+=shiftX-1.0;
+            p->x+=(shiftX-1.0)*dt/dx;
 
-            fluidGamma+=sqrt((oldP2+nowP2)*0.5+1.0+0.5*p->aa);
             cnt++;
+            fluidGamma+=0.5*(oldGamma+gamma);
             p=p->next;
           }		//End of while(p)
         }		//End of for(s)
-      if(cnt==0)  
-        D->gamma[i][j][k]=1.0;
-      else 
-        D->gamma[i][j][k]=fluidGamma/((double)cnt);
+
+        if(cnt==0)  
+          D->gamma[i][j][k]=1.0;
+        else 
+          D->gamma[i][j][k]=fluidGamma/((double)cnt);
     }
 }
 

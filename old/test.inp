@@ -11,6 +11,7 @@
  field_save=ON
  particle_save=ON
  current_save=ON
+ density_save=ON
  dump_save=1
  dump_start=10000
 

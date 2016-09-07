@@ -120,8 +120,8 @@ void updateCurrent1D_1st(Domain *D,int nSpecies)
               else 
                 xr=maximum(i1*1.0,i2*1.0);
 
-              Fx1=(xr-x1)*dt/dx;
-              Fx2=(x2-xr)*dt/dx;
+              Fx1=(xr-x1);
+              Fx2=(x2-xr);
               Wx1=0.5*(x1+xr)-i1;
               Wx2=0.5*(xr+x2)-i2;
    

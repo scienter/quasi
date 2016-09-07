@@ -140,7 +140,7 @@ void parameterSetting(Domain *D,char *input)
    D->domainMinX*=D->kp;
    D->domainX=D->domainMaxX-D->domainMinX;
    D->nx=((int)D->domainX*D->division);
-   D->dt=0.9*D->dx;
+   D->dt=D->dx;
 
    while(D->nx*D->dx<D->domainX)
      D->nx+=1;
@@ -222,7 +222,7 @@ int findLaserParameters(int rank, LaserList *L,Domain *D,char *input)
 
      //additional laser parameters
      L->mode=mode;
-     L->k0=2*pi*velocityC/lambda/D->kp;
+     L->k0=2*pi/lambda/D->kp;
 //     L->rayleighLength=pi/(lambda/D->gamma/(1.0+D->beta))*L->beamWaist*L->beamWaist/lambda;
 //     L->beamWaist=L->beamWaist/D->lambda;
 //     L->focus=L->focus/D->lambda;

@@ -21,6 +21,7 @@ typedef struct _ptclList  {
     double B2;    
     double B3;   
     double aa; 
+    double gamma; 
     int index; 
     int core; 
     struct _ptclList *next;

@@ -96,13 +96,13 @@ int main(int argc, char *argv[])
 //       fieldSolve(&D);
        interpolation(&D);
        particlePush(&D);
-       updateCurrent(&D);
+//       updateCurrent(&D);
 
 
        LL=D.loadList;
        s=0;
        while(LL->next)   {
-         loadPlasma(&D,LL,s,iteration);
+//         loadPlasma(&D,LL,s,iteration);
          LL=LL->next;
          s++;
        }
@@ -119,9 +119,9 @@ int main(int argc, char *argv[])
        t=D.dt*iteration;  
        D.minXSub++;
     }     //end of time roop                  
-/*
-    if(D.tracking==ON)
-      saveTracking(&D);
+
+//    if(D.tracking==ON)
+//      saveTracking(&D);
 
     end=clock();
     time_spent=(end-begin)/CLOCKS_PER_SEC;
@@ -136,12 +136,13 @@ int main(int argc, char *argv[])
       fprintf(out,"nz=%d\n",D.nz);
       fprintf(out,"cores=%d\n",nTasks);
       fprintf(out,"running time=%gm\n",time_spent/60.0);
+      fprintf(out,"dx=%g,kp=%g\n",D.dx/D.kp,D.kp);
       fclose(out);
     }
     else	;
 
-    cleanMemory(&D);
-*/    
+//    cleanMemory(&D);
+    
     MPI_Finalize();
 
     return 0;

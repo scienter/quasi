@@ -94,6 +94,7 @@ typedef struct _Domain
    Laser ***aNow;    
    Laser ***aOld;    
    Laser ***aOld2;
+   Laser ***aOld3;
 
    double ***Rho;    
    double ***gamma;    
