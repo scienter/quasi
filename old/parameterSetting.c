@@ -222,7 +222,7 @@ int findLaserParameters(int rank, LaserList *L,Domain *D,char *input)
 
      //additional laser parameters
      L->mode=mode;
-     L->k0=2*pi/lambda/D->kp;
+     L->k0=2.0*pi/lambda/D->kp;
 //     L->rayleighLength=pi/(lambda/D->gamma/(1.0+D->beta))*L->beamWaist*L->beamWaist/lambda;
 //     L->beamWaist=L->beamWaist/D->lambda;
 //     L->focus=L->focus/D->lambda;
