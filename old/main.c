@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
        LL=D.loadList;
        s=0;
        while(LL->next)   {
-//         loadPlasma(&D,LL,s,iteration);
+         loadPlasma(&D,LL,s,iteration);
          LL=LL->next;
          s++;
        }

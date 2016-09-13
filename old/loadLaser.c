@@ -41,13 +41,28 @@ void loadLaser1D(Domain *D,LaserList *L,double t)
    ibound=D->nx-(int)(offset*rU*D->division);
    for(i=istart; i<ibound; i++)  {
      x=(D->domainMinX+i-istart)*dx;
-     D->aNow[i][j][k].real=a0*exp(-(x-D->domainMaxX+offset*rU)*(x-D->domainMaxX+offset*rU)/rD/rD)*cos(L->k0*(i-iend)*dx);
-     D->aNow[i][j][k].img=a0*exp(-(x-D->domainMaxX+offset*rU)*(x-D->domainMaxX+offset*rU)/rD/rD)*sin(L->k0*(i-iend)*dx);
+     D->aNow[i][j][k].real=a0*exp(-(x-D->domainMaxX+offset*rU)*(x-D->domainMaxX+offset*rU)/rD/rD);
+     D->aNow[i][j][k].img=0.0;
+//     D->aNow[i][j][k].img=-1.0/L->k0*D->aNow[i][j][k].real;
+     D->aOld[i][j][k].real=D->aNow[i][j][k].real;
+     D->aOld[i][j][k].img=D->aNow[i][j][k].img;
+     D->aOld2[i][j][k].real=D->aNow[i][j][k].real;
+     D->aOld2[i][j][k].img=D->aNow[i][j][k].img;
+     D->aOld3[i][j][k].real=D->aNow[i][j][k].real;
+     D->aOld3[i][j][k].img=D->aNow[i][j][k].img;
    }
+
    for(i=ibound; i<iend; i++)  {
      x=(D->domainMinX+i-istart)*dx;
-     D->aNow[i][j][k].real=a0*exp(-(x-D->domainMaxX+offset*rU)*(x-D->domainMaxX+offset*rU)/rU/rU)*cos(L->k0*(i-iend)*dx);
-     D->aNow[i][j][k].img=a0*exp(-(x-D->domainMaxX+offset*rU)*(x-D->domainMaxX+offset*rU)/rU/rU)*sin(L->k0*(i-iend)*dx);
+     D->aNow[i][j][k].real=a0*exp(-(x-D->domainMaxX+offset*rU)*(x-D->domainMaxX+offset*rU)/rU/rU);
+     D->aNow[i][j][k].img=0.0;
+//     D->aNow[i][j][k].img=-1.0/L->k0*D->aNow[i][j][k].real;
+     D->aOld[i][j][k].real=D->aNow[i][j][k].real;
+     D->aOld[i][j][k].img=D->aNow[i][j][k].img;
+     D->aOld2[i][j][k].real=D->aNow[i][j][k].real;
+     D->aOld2[i][j][k].img=D->aNow[i][j][k].img;
+     D->aOld3[i][j][k].real=D->aNow[i][j][k].real;
+     D->aOld3[i][j][k].img=D->aNow[i][j][k].img;
    }
 /*
    for(i=istart; i<iend; i++)  {

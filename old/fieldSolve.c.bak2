@@ -79,7 +79,8 @@ void Esolve1D(Domain *D)
 void solveLaser(Domain *D)
 {
   int i,j,k,n,istart,iend;
-  double dx,dt,a,b,c,d,e,alpha1,alpha2,alpha3,beta1,beta2,beta3,kp;
+  double dx,dt,a,b,c,d,e,f,g,h,o;
+  double alpha1,alpha2,alpha3,alpha4,beta1,beta2,beta3,beta4,kp;
   double densityRatio;
   LaserList *L;
 
@@ -93,7 +94,9 @@ void solveLaser(Domain *D)
 
   L=D->laserList;
   while(L->next)  {
-    for(i=istart; i<iend; i++)  {
+    for(i=0; i<iend+3; i++)  {
+      D->aOld3[i][0][0].real=D->aOld2[i][j][k].real;
+      D->aOld3[i][0][0].img=D->aOld2[i][j][k].img;
       D->aOld2[i][0][0].real=D->aOld[i][j][k].real;
       D->aOld2[i][0][0].img=D->aOld[i][j][k].img;
       D->aOld[i][j][k].real=D->aNow[i][j][k].real;
@@ -101,46 +104,95 @@ void solveLaser(Domain *D)
       D->aNow[i][j][k].real=D->aNext[i][j][k].real;
       D->aNow[i][j][k].img=D->aNext[i][j][k].img;
     }
-      
+     
     for(i=istart; i<iend; i++)  {
-      densityRatio=-dt*dt*0.5*D->Rho[i-1][j][k]/D->gamma[i-1][j][k];
-      c=-dt/dx;
-      a=1.0+c+densityRatio;
-      d=-1.0+c-densityRatio;
-      b=-L->k0*dt;       
-      e=a*a+b*b;
+//      i=iend;
+      densityRatio=0.0; //dt*0.5*D->Rho[i+1][j][k]/D->gamma[i+1][j][k];
+      a=-1.0/dx;
+      b=0.5*L->k0;       
+      c=a;
+      d=-b;
+      e=-densityRatio;
+      f=a;
+      g=b;
+      o=a*a+b*b;
+//printf("a=%g, b=%g,C=%g, d=%g, e=%g, f=%g,g=%g,o=%g\n",a,b,c,d,e,f,h,o); //lala
 
-      alpha1=a*c/e;
-      beta1=-b*c/e;
-      alpha2=2.0*a/e;
-      beta2=-2.0*b/e;
-      alpha3=(a*d+b*b)/e;
-      beta3=(b*a-b*d)/e;
+      alpha1=(a*c+b*d)/o;
+      beta1=(a*d-b*c)/o;
+      alpha2=a*e/o;
+      beta2=-e*b/o;
+      alpha3=(a*f+b*g)/o;
+      beta3=(a*g-b*f)/o;
 
-      D->aNext[i-1][j][k].real=(D->aNow[i][j][k].real-D->aOld2[i][j][k].real)*alpha1-(D->aNow[i][j][k].img-D->aOld2[i][j][k].img)*beta1+D->aNow[i-1][j][k].real*alpha2-D->aNow[i-1][j][k].img*beta2+D->aOld[i-1][j][k].real*alpha3-D->aOld[i-1][j][k].img*beta3;
-      D->aNext[i-1][j][k].img=(D->aNow[i][j][k].real-D->aOld2[i][j][k].real)*beta1+(D->aNow[i][j][k].img-D->aOld2[i][j][k].img)*alpha1+D->aNow[i-1][j][k].real*beta2+D->aNow[i-1][j][k].img*alpha2+D->aOld[i-1][j][k].real*beta3+D->aOld[i-1][j][k].img*alpha3;
+      D->aNext[i][j][k].real=(D->aOld[i+1][j][k].real-D->aOld3[i+1][j][k].real)*alpha1-(D->aOld[i+1][j][k].img-D->aOld3[i+1][j][k].img)*beta1
+        +(D->aNow[i+1][j][k].real+D->aNow[i][j][k].real)*alpha2-(D->aNow[i+1][j][k].img+D->aNow[i][j][k].img)*beta2
+        +D->aOld[i][j][k].real*alpha3-D->aOld[i][j][k].img*beta3;
+      D->aNext[i][j][k].img=(D->aOld[i+1][j][k].img-D->aOld3[i+1][j][k].img)*alpha1+(D->aOld[i+1][j][k].real-D->aOld3[i+1][j][k].real)*beta1
+        +(D->aNow[i+1][j][k].img+D->aNow[i][j][k].img)*alpha2+(D->aNow[i+1][j][k].real+D->aNow[i][j][k].real)*beta2
+        +D->aOld[i][j][k].img*alpha3+D->aOld[i][j][k].real*beta3;
     }
 
     for(n=0; n<1; n++)  {
       for(i=istart; i<iend; i++)  {
-        densityRatio=-dt*dt*0.5*D->Rho[i-1][j][k]/D->gamma[i-1][j][k];
-        c=-dt/dx;
-        a=1.0+c+densityRatio;
-        d=-1.0+c-densityRatio;
-        b=-L->k0*dt;       
-        e=a*a+b*b;
+      densityRatio=dt*0.5*D->Rho[i+1][j][k]/D->gamma[i+1][j][k];
+      a=-1.0/dx;
+      b=0.5*L->k0;       
+      c=a;
+      d=-b;
+      e=-densityRatio;
+      f=a;
+      g=b;
+      o=a*a+b*b;
+//printf("a=%g, b=%g,C=%g, d=%g, e=%g, f=%g,g=%g,h=%g,o=%g\n",a,b,c,d,e,f,g,h,o); //lala
 
-        alpha1=a*c/e;
-        beta1=-b*c/e;
-        alpha2=2.0*a/e;
-        beta2=-2.0*b/e;
-        alpha3=(a*d+b*b)/e;
-        beta3=(b*a-b*d)/e;
+      alpha1=(a*c+b*d)/o;
+      beta1=(a*d-b*c)/o;
+      alpha2=a*e/o;
+      beta2=-e*b/o;
+      alpha3=(a*f+b*g)/o;
+      beta3=(a*g-b*f)/o;
 
-        D->aNext[i-1][j][k].real=(D->aNext[i][j][k].real-D->aOld[i][j][k].real)*alpha1-(D->aNext[i][j][k].img-D->aOld[i][j][k].img)*beta1+D->aNow[i-1][j][k].real*alpha2-D->aNow[i-1][j][k].img*beta2+D->aOld[i-1][j][k].real*alpha3-D->aOld[i-1][j][k].img*beta3;
-        D->aNext[i-1][j][k].img=(D->aNext[i][j][k].real-D->aOld[i][j][k].real)*beta1+(D->aNext[i][j][k].img-D->aOld[i][j][k].img)*alpha1+D->aNow[i-1][j][k].real*beta2+D->aNow[i-1][j][k].img*alpha2+D->aOld[i-1][j][k].real*beta3+D->aOld[i-1][j][k].img*alpha3;
+      D->aNext[i][j][k].real=(D->aNext[i+1][j][k].real-D->aOld[i+1][j][k].real)*alpha1-(D->aNext[i+1][j][k].img-D->aOld[i+1][j][k].img)*beta1
+        +(D->aNow[i+1][j][k].real+D->aNow[i][j][k].real)*alpha2-(D->aNow[i+1][j][k].img+D->aNow[i][j][k].img)*beta2
+        +D->aOld[i][j][k].real*alpha3-D->aOld[i][j][k].img*beta3;
+      D->aNext[i][j][k].img=(D->aOld[i+1][j][k].img-D->aOld3[i+1][j][k].img)*alpha1+(D->aOld[i+1][j][k].real-D->aOld3[i+1][j][k].real)*beta1
+        +(D->aNow[i+1][j][k].img+D->aNow[i][j][k].img)*alpha2+(D->aNow[i+1][j][k].real+D->aNow[i][j][k].real)*beta2
+        +D->aOld[i][j][k].img*alpha3+D->aOld[i][j][k].real*beta3;
       }
     }
+/*
+      for(i=istart; i<iend; i++)  {
+        densityRatio=dt*dt*0.5*D->Rho[i-1][j][k]/D->gamma[i-1][j][k];
+        c=dt/dx;
+        a=0.5+c;
+        b=-0.5*L->k0*dt;       
+        d=-b;
+        e=-densityRatio;
+        f=1.0+e;
+        g=c-0.5;
+        h=b;
+        o=a*a+b*b;
+
+        alpha1=(a*c+b*d)/o;
+        beta1=(a*d-b*c)/o;
+        alpha2=a*e/o;
+        beta2=-e*b/o;
+        alpha3=a*f/o;
+        beta3=-f*b/o;
+        alpha4=(a*g+b*h)/o;
+        beta4=(a*h-b*g)/o;
+
+        D->aNext[i-1][j][k].real=(D->aNext[i][j][k].real-D->aOld[i][j][k].real)*alpha1-(D->aNext[i][j][k].img-D->aOld[i][j][k].img)*beta1
+          +D->aNow[i][j][k].real*alpha2-D->aNow[i][j][k].img*beta2
+          +D->aNow[i-1][j][k].real*alpha3-D->aNow[i-1][j][k].img*beta3
+          +D->aOld[i-1][j][k].real*alpha4-D->aOld[i-1][j][k].img*beta4;
+        D->aNext[i-1][j][k].img=(D->aNext[i][j][k].img-D->aOld[i][j][k].img)*alpha1+(D->aNext[i][j][k].real-D->aOld[i][j][k].real)*beta1
+          +D->aNow[i][j][k].img*alpha2+D->aNow[i][j][k].real*beta2
+          +D->aNow[i-1][j][k].img*alpha3+D->aNow[i-1][j][k].real*beta3
+          +D->aOld[i-1][j][k].img*alpha4+D->aOld[i-1][j][k].real*beta4;
+      }
+*/
     L=L->next;
   }
 

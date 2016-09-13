@@ -140,7 +140,7 @@ void parameterSetting(Domain *D,char *input)
    D->domainMinX*=D->kp;
    D->domainX=D->domainMaxX-D->domainMinX;
    D->nx=((int)D->domainX*D->division);
-   D->dt=0.9*D->dx;
+   D->dt=D->dx;
 
    while(D->nx*D->dx<D->domainX)
      D->nx+=1;
