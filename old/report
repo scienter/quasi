@@ -1,6 +1,6 @@
 nx=595
 ny=32767
-nz=470594363
+nz=104121147
 cores=1
-running time=0m
+running time=0.1m
 dx=8.40906e-08,kp=594597

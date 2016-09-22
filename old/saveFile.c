@@ -167,6 +167,7 @@ void saveRho(Domain *D,int iteration)
     switch (D->dimension)  {
     case 1 :
       j=k=0;
+/*
       for(i=0; i<iend+3; i++)
         D->Rho[i][j][k]=0.0;
       
@@ -193,6 +194,7 @@ void saveRho(Domain *D,int iteration)
               p=p->next;
             }
           }
+*/
 
       sprintf(name,"rho%d_%d",iteration,myrank);
       out = fopen(name,"w");    

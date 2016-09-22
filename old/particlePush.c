@@ -107,7 +107,7 @@ void particlePush1D(Domain *D)
             k2=coef*(Ez+p1*By-p2*Bx)/gamma;
             p->p3+=k2;
 
-            p->gamma=gamma=sqrt(1.0+p1*p1+p2*p2+p3*p3+0.5*aa);
+            p->gamma=gamma=sqrt(1.0+p->p1*p->p1+p->p2*p->p2+p->p3*p->p3+0.5*aa);
             //Translation
             shiftX=p->p1/gamma;    //dt is ignored because of dx=dt=1 in cell.
              //dt is ignored because of dx=dt=1 in cell.

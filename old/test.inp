@@ -3,15 +3,14 @@
  current_order=3
  interpolation_order=2
 
- max_step=1000
- save_step=100
+ max_step=10000
+ save_step=1000
  save_start=0
 
  save_mode=TXT
  field_save=ON
  particle_save=ON
  current_save=ON
- density_save=ON
  dump_save=1
  dump_start=10000
 
@@ -54,7 +53,7 @@
  Xnodes=4
  X0=40e-6
  X1=50e-6
- X2=100e-6
+ X2=300e-6
  X3=11000e-6
  Xn0=0
  Xn1=1

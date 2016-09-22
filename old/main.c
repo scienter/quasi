@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
 //       fieldSolve(&D);
        interpolation(&D);
        particlePush(&D);
-//       updateCurrent(&D);
+       updateCurrent(&D);
 
 
        LL=D.loadList;
